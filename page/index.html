@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>D3</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <script src='../lib/d3.v3.js'></script>
+</head>
+<body>
+    <script>
+
+        drawTree();
+        
+        function drawTree(){
+            var treeDatas = {
+                id:'000000',
+                text:'中国',
+                children:[
+                    {
+                        id:'110000',
+                        text:'北京',
+                        children:[
+                            {
+                                id:'110111',
+                                text:'房山区'
+                            },
+                            {
+                                id:'110112',
+                                text:'通州区'
+                            }
+                        ]
+                    },
+                    {
+                        id:'330000',
+                        text:'浙江省',
+                        children:[
+                            {
+                                id:'330100',
+                                text:'杭州市',
+                                children:[
+                                    {
+                                        id:'330102',
+                                        text:'上城区'
+                                    },
+                                    {
+                                        id:'330103',
+                                        text:'下城区'
+                                    }
+                                ]
+                            },
+                            {
+                                id:'330200',
+                                text:'宁波市',
+                                children:[
+                                    {
+                                        id:'330203',
+                                        text:'海曙区'
+                                    },
+                                    {
+                                        id:'330204',
+                                        text:'江东区'
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+            const tree = d3.layout.tree().size([20,20])
+            //  .nodeSize([1, 1]);
+            tree.sort(function(a,b){
+                var r = a.text > b.text;
+                console.log(a.text+'>'+b.text ,r)
+                return r?-1:1;
+            })
+            const nodes = tree.nodes(treeDatas);
+            // var offset = 900;
+            // const treeData2 = tree.nodes(treeDatas);
+            // var treeResult = traverseTree(nodes[0],function (node) {
+            //     node.datas = node.datas||{};
+            //     node.datas.x = node.y;
+            //     node.datas.y = node.x+offset;
+            // })
+            drawContainer([20,20],nodes)
+        }
+
+        function demo(){
+            // x 行 y 列
+            var treeDatas = {
+                id:'0000',
+                text:'中国',
+                datas:{x:10,y:0},
+                children:[
+                    {
+                        id:'0100',
+                        text:'湖北',
+                        datas:{x:5,y:2},
+                    },
+                    {
+                        id:'0200',
+                        text:'浙江',
+                        datas:{x:15,y:2},
+                    }
+                ]
+            }
+
+            var nodeDatas = [];
+            traverseTree(treeDatas,function(node){
+                var datas = node.datas ||{};
+                nodeDatas.push({x:datas.x,y:datas.y,text:node.text})
+            })
+
+            drawContainer([10,50],nodeDatas)
+        }
+
+
+        /**
+         * 初始化容器 
+         *  sizes: [x,y]
+         */
+        function drawContainer(sizes,datas){
+            var xindex = sizes[0],yindex = sizes[1];
+
+            var container = [];
+            
+            for(var y=0;y<yindex;y++){
+                var xcontainer = [];
+                for(var x=0;x<xindex;x++){
+                    xcontainer.push(0);
+                }
+                container.push(xcontainer)
+            }
+
+            //画容器
+            // console.table(container)
+
+            //加载数据
+            if(datas)
+                for(var index in datas){
+                    var data = datas[index];
+             //       console.log(data)
+                    container[ Math.floor(data.x)][Math.floor(data.y)] = data.text;
+                }
+
+            console.table(container)
+        }
+
+        function traverseTree(tree,treeParser){
+            treeParser(tree);
+
+            if(tree.children){
+                tree.children.forEach(function(child){
+                    treeParser(child);
+                })
+            }
+        }
+
+    </script>
+</body>
+</html>
